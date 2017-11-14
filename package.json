@@ -1,0 +1,27 @@
+{
+  "name": "flick",
+  "version": "0.0.1",
+  "description": "Click game.",
+  "main": "index.js",
+  "dependencies": {
+    "pixi.js": "^4.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Dank",
+    "Game"
+  ],
+  "author": "Jutt",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProfessorJutt/Flick.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ProfessorJutt/Flick/issues"
+  },
+  "homepage": "https://github.com/ProfessorJutt/Flick#readme"
+}
