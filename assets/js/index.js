@@ -5,22 +5,11 @@ var app = new PIXI.Application(1600, 900, {
 const gameLandscapeRatio = 1600 / 900;
 var container = new PIXI.Container();
 var background = PIXI.Sprite.fromImage('assets/images/flag_background.png');
-
-document.body.appendChild(app.view);
-
-var currentTexture = 1;
 var bush1Texture = PIXI.Texture.fromImage('assets/images/bush1.png');
 var bush2Texture = PIXI.Texture.fromImage('assets/images/bush2.png');
 var bush3Texture = PIXI.Texture.fromImage('assets/images/bush3.png');
 var bush4Texture = PIXI.Texture.fromImage('assets/images/bush4.png');
 var bush5Texture = PIXI.Texture.fromImage('assets/images/bush5.png');
-var pointTick = 1000;
-var pointTicker;
-var tickerActive = false;
-var currentPoints = 0;
-var currentRound = 1;
-var clicked = false;
-
 var scoreText = new PIXI.Text('Wang Size: 0.000"', {
     fontWeight: 'bold',
     fontSize: 40,
@@ -30,15 +19,37 @@ var scoreText = new PIXI.Text('Wang Size: 0.000"', {
     stroke: '#FFFFFF',
     strokeThickness: 3
 });
-
-scoreText.x = app.renderer.width / 2;
-
-window.addEventListener("resize", resizeGame);
+var startText = new PIXI.Text('Start!', {
+    fontWeight: 'bold',
+    fontSize: 60,
+    fontFamily: 'Arial',
+    fill: 'green',
+    align: 'center',
+    stroke: '#FFFFFF',
+    strokeThickness: 3
+});
 
 app.stage.addChild(background);
 app.stage.addChild(container);
 app.stage.addChild(scoreText);
+app.stage.addChild(startText);
+document.body.appendChild(app.view);
+window.addEventListener("resize", resizeGame);
 
+var currentTexture = 1;
+var pointTick = 1000;
+var pointTicker;
+var tickerActive = false;
+var currentPoints = 0;
+var currentRound = 1;
+var activeIndex = -1;
+
+scoreText.x = app.renderer.width / 2;
+startText.x = app.renderer.width / 2;
+startText.y = app.renderer.height / 2;
+startText.interactive = true;
+startText.buttonMode = true;
+startText.on('pointerdown', startGame);
 
 // Create a 12x12 Grid
 for (var i = 0; i < 144; i++) {
@@ -70,7 +81,7 @@ function startPointTicker () {
         if (pointTick > 0) pointTick--;
         tickerActive = true;
     }, 1);
-    
+
     // Preventing race condition incase someone has lighting fingers...
     tickerActive = true;
 }
@@ -97,15 +108,23 @@ function onClick() {
         }, 500);        
     }
     else {
+        startText.text = 'Start a new game!';
+        startText.interactive = true;
+        startText.buttonMode = true;
+        startText.alpha = 1;
         console.log(currentPoints);
     }        
 }
 
 function activatePoint() {
-    var child = container.getChildAt(getRandomNumber(0, 143));
+    activeIndex = getRandomNumber(0, 143);
+
+    var child = container.getChildAt(activeIndex);
     child.alpha = 1;
     child.interactive = true;
     child.buttonMode = true;
+
+    if (!tickerActive) startPointTicker();
 }
 
 function getRandomNumber(min, max) {
@@ -115,7 +134,7 @@ function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function resizeGame() {
+function resizeGame () {
     // Buffer for the window...
     var buffer = 21;
 
@@ -123,7 +142,6 @@ function resizeGame() {
     app.renderer.resize(window.innerWidth - buffer, window.innerHeight - buffer);
 
     var bg = app.stage.getChildAt(0);
-
     bg.width = window.innerWidth - buffer;
     bg.height = window.innerHeight - buffer;
 
@@ -132,5 +150,16 @@ function resizeGame() {
     container.y = (app.renderer.height - container.height) / 2;
 }
 
+function startGame () {
+    pointTick = 1000;    
+    currentPoints = 0;
+    currentRound = 1;
+    activeIndex = -1;
+    
+    startText.interactive = false;
+    startText.buttonMode = false;
+    startText.alpha = 0;
+    activatePoint();
+}
+
 resizeGame();
-activatePoint();
